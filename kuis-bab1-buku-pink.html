@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis Bab 1 – Buku Pink</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --pink: #c0304a;
+    --pink-light: #f7e0e4;
+    --pink-mid: #e8a0aa;
+    --dark: #2a1018;
+    --cream: #fdf5f6;
+    --gold: #c9954c;
+    --white: #ffffff;
+    --shadow: 0 4px 20px rgba(192,48,74,0.13);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', 'Noto Sans JP', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--pink) 0%, #8b1a2e 100%);
+    color: white;
+    text-align: center;
+    padding: 32px 20px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.03) 0,
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+  }
+  .header-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  header .jp-title {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 18px;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  header .sub {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  .score-bar {
+    background: white;
+    border-bottom: 2px solid var(--pink-light);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pink);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--pink-light);
+    border-radius: 99px;
+    margin: 0 14px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink), var(--gold));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .quiz-wrap {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .q-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: border 0.3s;
+  }
+  .q-card.answered-correct { border-color: #4caf50; }
+  .q-card.answered-wrong { border-color: #e53935; }
+
+  .q-header {
+    background: var(--pink-light);
+    padding: 14px 18px 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .q-num {
+    background: var(--pink);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .q-section {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--pink);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .q-text {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--dark);
+  }
+  .q-text .jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 20px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .options {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .opt {
+    border: 2px solid #e8e0e2;
+    border-radius: 12px;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    text-align: left;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--dark);
+  }
+  .opt:hover:not(:disabled) {
+    border-color: var(--pink-mid);
+    background: var(--pink-light);
+  }
+  .opt-letter {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--pink-light);
+    color: var(--pink);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .opt .jp-opt { font-family: 'Noto Sans JP', sans-serif; }
+
+  .opt.correct {
+    border-color: #4caf50;
+    background: #f1faf2;
+  }
+  .opt.correct .opt-letter {
+    background: #4caf50;
+    color: white;
+  }
+  .opt.wrong {
+    border-color: #e53935;
+    background: #fff5f5;
+  }
+  .opt.wrong .opt-letter {
+    background: #e53935;
+    color: white;
+  }
+  .opt:disabled { cursor: default; }
+
+  .feedback {
+    padding: 0 16px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .feedback.show { display: flex; }
+  .feedback.ok { color: #2e7d32; }
+  .feedback.ng { color: #c62828; }
+  .feedback-icon { font-size: 18px; }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .result-screen.show { display: block; }
+  .result-emoji { font-size: 64px; margin-bottom: 14px; }
+  .result-screen h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--pink);
+    margin-bottom: 8px;
+  }
+  .score-big {
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 16px 0 8px;
+  }
+  .score-big span { color: var(--pink); }
+  .result-msg {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .btn-retry {
+    background: linear-gradient(135deg, var(--pink), #8b1a2e);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(192,48,74,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-retry:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(192,48,74,0.45);
+  }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin: 4px 0 -4px;
+  }
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--pink-light);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">🌸 Buku Pink · 入門</div>
+  <div class="jp-title">第１課　おはようございます</div>
+  <h1>Kuis Bab 1 – Buku Pink</h1>
+  <div class="sub">Pilih jawaban yang paling tepat</div>
+</header>
+
+<div class="score-bar">
+  <span id="answered-count">0/25</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <span id="correct-count">✓ 0</span>
+</div>
+
+<div class="quiz-wrap" id="quiz-wrap"></div>
+<div class="result-screen" id="result-screen">
+  <div class="result-emoji" id="result-emoji">🎉</div>
+  <h2>Hasil Kuis</h2>
+  <div class="score-big" id="score-big"></div>
+  <div class="result-msg" id="result-msg"></div>
+  <button class="btn-retry" onclick="resetQuiz()">🔄 Ulangi Kuis</button>
+</div>
+
+<script>
+const questions = [
+  // Bagian 1: こんにちは
+  {
+    section: "1. こんにちは",
+    q: "Apa arti dari <span class='jp'>おはようございます</span>？",
+    opts: ["Selamat siang.", "Selamat pagi.", "Selamat malam.", "Selamat tidur."],
+    ans: 1
+  },
+  {
+    section: "1. こんにちは",
+    q: "Cara membaca <span class='jp'>こんにちは</span> dalam romaji adalah…",
+    opts: ["konbanwa", "ohayoo", "konnichiwa", "sayoonara"],
+    ans: 2
+  },
+  {
+    section: "1. こんにちは",
+    q: "<span class='jp'>こんばんは</span> digunakan untuk…",
+    opts: ["Menyapa di pagi hari", "Menyapa di siang hari", "Menyapa di malam hari", "Berpamitan"],
+    ans: 2
+  },
+  {
+    section: "1. こんにちは",
+    q: "Saat bertemu teman di siang hari, ungkapan yang tepat adalah…",
+    opts: ["おはようございます", "こんばんは", "おやすみなさい", "こんにちは"],
+    ans: 3
+  },
+  {
+    section: "1. こんにちは",
+    q: "「ohayoo gozaimasu」adalah romaji dari…",
+    opts: ["こんにちは", "こんばんは", "おはようございます", "おやすみなさい"],
+    ans: 2
+  },
+
+  // Bagian 2: お先に失礼します
+  {
+    section: "2. お先に失礼します",
+    q: "<span class='jp'>じゃあ、また</span> artinya…",
+    opts: ["Sampai jumpa.", "Selamat tidur.", "Permisi, saya duluan.", "Terima kasih."],
+    ans: 0
+  },
+  {
+    section: "2. お先に失礼します",
+    q: "Ungkapan <span class='jp'>おやすみ（なさい）</span> digunakan ketika…",
+    opts: ["Berangkat kerja", "Hendak tidur / beristirahat", "Pulang lebih awal", "Bertemu di pagi hari"],
+    ans: 1
+  },
+  {
+    section: "2. お先に失礼します",
+    q: "<span class='jp'>失礼します</span> dalam Bahasa Indonesia berarti…",
+    opts: ["Selamat tinggal.", "Sampai jumpa.", "Saya permisi; Saya pamit.", "Terima kasih banyak."],
+    ans: 2
+  },
+  {
+    section: "2. お先に失礼します",
+    q: "Ketika pulang lebih awal dari rekan kerja, ungkapan yang tepat adalah…",
+    opts: ["じゃあ、また", "お先に失礼します", "おやすみなさい", "ありがとうございます"],
+    ans: 1
+  },
+  {
+    section: "2. お先に失礼します",
+    q: "<span class='jp'>おつかれさま（でした）</span> artinya…",
+    opts: ["Permisi, saya duluan.", "Saya mohon maaf.", "Sampai jumpa, terima kasih atas kerja kerasnya.", "Silakan."],
+    ans: 2
+  },
+
+  // Bagian 3: ありがとうございます
+  {
+    section: "3. ありがとうございます",
+    q: "<span class='jp'>これ</span> artinya…",
+    opts: ["permen", "hadiah", "ini", "silakan"],
+    ans: 2
+  },
+  {
+    section: "3. ありがとうございます",
+    q: "<span class='jp'>あめ</span> dalam Bahasa Indonesia adalah…",
+    opts: ["hadiah", "ini", "hujan", "permen"],
+    ans: 3
+  },
+  {
+    section: "3. ありがとうございます",
+    q: "Kata <span class='jp'>プレゼント</span> berarti…",
+    opts: ["terima kasih", "permen", "hadiah", "ini"],
+    ans: 2
+  },
+  {
+    section: "3. ありがとうございます",
+    q: "<span class='jp'>ありがとうございます</span> artinya…",
+    opts: ["Sama-sama.", "Terima kasih.", "Maaf.", "Silakan."],
+    ans: 1
+  },
+  {
+    section: "3. ありがとうございます",
+    q: "Ungkapan paling santai untuk 'terima kasih banyak' adalah…",
+    opts: ["すみません", "ありがとうございます", "（どうも）ありがとう", "どうも"],
+    ans: 2
+  },
+  {
+    section: "3. ありがとうございます",
+    q: "<span class='jp'>どうぞ</span> artinya…",
+    opts: ["Makasih.", "Silakan.", "Sama-sama.", "Terima kasih."],
+    ans: 1
+  },
+  {
+    section: "3. ありがとうございます",
+    q: "<span class='jp'>落としましたよ</span> berarti…",
+    opts: ["Anda menjatuhkannya.", "Terima kasih.", "Silakan.", "Sama-sama."],
+    ans: 0
+  },
+
+  // Bagian 3 lanjutan: 謝る (Meminta maaf)
+  {
+    section: "3b. 謝る (Meminta Maaf)",
+    q: "<span class='jp'>いいえ</span> artinya…",
+    opts: ["Terima kasih.", "Sama-sama.", "Tidak / Bukan begitu.", "Silakan."],
+    ans: 1
+  },
+  {
+    section: "3b. 謝る (Meminta Maaf)",
+    q: "<span class='jp'>わあ</span> diucapkan untuk mengungkapkan…",
+    opts: ["Rasa sakit", "Rasa terkejut / kagum", "Rasa terima kasih", "Permintaan maaf"],
+    ans: 1
+  },
+  {
+    section: "3b. 謝る (Meminta Maaf)",
+    q: "<span class='jp'>すみません</span> dalam konteks meminta maaf berarti…",
+    opts: ["Terima kasih banyak.", "Saya mohon maaf.", "Silakan.", "Sama-sama."],
+    ans: 1
+  },
+  {
+    section: "3b. 謝る (Meminta Maaf)",
+    q: "<span class='jp'>ごめん</span> artinya…",
+    opts: ["Aduh!", "Wah!", "Maaf.", "Sama-sama."],
+    ans: 2
+  },
+  {
+    section: "3b. 謝る (Meminta Maaf)",
+    q: "Perbedaan <span class='jp'>すみません</span> dan <span class='jp'>ごめん</span> adalah…",
+    opts: [
+      "すみません lebih formal; ごめん lebih santai",
+      "すみません lebih santai; ごめん lebih formal",
+      "Keduanya sama persis maknanya",
+      "すみません hanya untuk terima kasih"
+    ],
+    ans: 0
+  },
+
+  // Bagian 4: メッセージスタンプ
+  {
+    section: "4. メッセージスタンプ",
+    q: "<span class='jp'>おめでとうございます</span> artinya…",
+    opts: ["Saya mengerti.", "Maaf.", "Selamat!", "Sama-sama."],
+    ans: 2
+  },
+  {
+    section: "4. メッセージスタンプ",
+    q: "<span class='jp'>わかりました</span> berarti…",
+    opts: ["Wah!", "Saya mengerti.", "Maaf.", "Aduh!"],
+    ans: 1
+  },
+  {
+    section: "4. メッセージスタンプ",
+    q: "<span class='jp'>痛い！</span> (itai) diucapkan ketika…",
+    opts: ["Merasa kagum", "Ingin meminta maaf", "Merasa kesakitan", "Ingin mengucapkan terima kasih"],
+    ans: 2
+  }
+];
+
+let answered = 0;
+let correct = 0;
+const total = questions.length;
+
+function buildQuiz() {
+  const wrap = document.getElementById('quiz-wrap');
+  wrap.innerHTML = '';
+  answered = 0; correct = 0;
+  updateBar();
+
+  let lastSection = '';
+  questions.forEach((q, i) => {
+    if (q.section !== lastSection) {
+      const div = document.createElement('div');
+      div.className = 'section-divider';
+      div.textContent = q.section;
+      wrap.appendChild(div);
+      lastSection = q.section;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = `card-${i}`;
+
+    const letters = ['A','B','C','D'];
+    const optsHtml = q.opts.map((o, j) =>
+      `<button class="opt" onclick="pick(${i},${j})" id="opt-${i}-${j}">
+        <span class="opt-letter">${letters[j]}</span>
+        <span>${o}</span>
+      </button>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">${i+1}</div>
+        <div>
+          <div class="q-section">${q.section}</div>
+          <div class="q-text">${q.q}</div>
+        </div>
+      </div>
+      <div class="options">${optsHtml}</div>
+      <div class="feedback" id="fb-${i}">
+        <span class="feedback-icon"></span>
+        <span class="fb-text"></span>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+function pick(qi, oi) {
+  const q = questions[qi];
+  const card = document.getElementById(`card-${qi}`);
+  if (card.classList.contains('answered-correct') || card.classList.contains('answered-wrong')) return;
+
+  const isCorrect = oi === q.ans;
+  answered++;
+  if (isCorrect) correct++;
+
+  for (let j = 0; j < q.opts.length; j++) {
+    const btn = document.getElementById(`opt-${qi}-${j}`);
+    btn.disabled = true;
+    if (j === q.ans) btn.classList.add('correct');
+    else if (j === oi && !isCorrect) btn.classList.add('wrong');
+  }
+
+  card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+
+  const fb = document.getElementById(`fb-${qi}`);
+  fb.classList.add('show', isCorrect ? 'ok' : 'ng');
+  fb.querySelector('.feedback-icon').textContent = isCorrect ? '✅' : '❌';
+  fb.querySelector('.fb-text').textContent = isCorrect
+    ? 'Benar!'
+    : `Jawaban benar: ${String.fromCharCode(65 + q.ans)}. ${q.opts[q.ans]}`;
+
+  updateBar();
+
+  if (answered === total) {
+    setTimeout(showResult, 800);
+  }
+}
+
+function updateBar() {
+  document.getElementById('answered-count').textContent = `${answered}/${total}`;
+  document.getElementById('correct-count').textContent = `✓ ${correct}`;
+  document.getElementById('progress-fill').style.width = `${(answered/total)*100}%`;
+}
+
+function showResult() {
+  document.getElementById('quiz-wrap').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.classList.add('show');
+
+  const pct = Math.round((correct/total)*100);
+  document.getElementById('score-big').innerHTML = `<span>${correct}</span> / ${total}`;
+
+  let emoji = '😢', msg = 'Jangan menyerah! Coba pelajari lagi kosakatanya ya.';
+  if (pct >= 90) { emoji = '🌸'; msg = 'Luar biasa! Kamu menguasai Bab 1 dengan sangat baik!'; }
+  else if (pct >= 70) { emoji = '😊'; msg = 'Bagus sekali! Tinggal sedikit lagi sempurna.'; }
+  else if (pct >= 50) { emoji = '🙂'; msg = 'Lumayan! Coba ulangi bagian yang salah ya.'; }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-msg').textContent = msg;
+}
+
+function resetQuiz() {
+  document.getElementById('result-screen').classList.remove('show');
+  document.getElementById('quiz-wrap').style.display = '';
+  buildQuiz();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
